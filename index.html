@@ -5,21 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Link to URL Generator</title>
     <script>
+        function isValidURL(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
         function downloadURLFile() {
-            let url = document.getElementById("urlInput").value;
-            if (!url) {
+            let url = document.getElementById("urlInput").value.trim();
+            if (!isValidURL(url)) {
                 alert("Please enter a valid URL.");
                 return;
             }
+
+            let fileName = prompt("Enter file name (without extension):", "link-to-url") || "link-to-url";
+            fileName = fileName.replace(/[^a-zA-Z0-9_-]/g, ""); // Sanitize filename
 
             let content = `[InternetShortcut]\nURL=${url}`;
             let blob = new Blob([content], { type: "text/plain" });
             let a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
-            a.download = "link-to-url.url";
+            a.download = `${fileName}.url`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+
+            alert("Download complete!");
         }
     </script>
 </head>
@@ -29,3 +43,4 @@
     <button onclick="downloadURLFile()" style="padding: 10px; margin-left: 10px;">Download .url</button>
 </body>
 </html>
+
