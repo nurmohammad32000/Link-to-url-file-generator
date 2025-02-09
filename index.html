@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link to URL Generator</title>
+    <script>
+        function downloadURLFile() {
+            let url = document.getElementById("urlInput").value;
+            if (!url) {
+                alert("Please enter a valid URL.");
+                return;
+            }
+
+            let content = `[InternetShortcut]\nURL=${url}`;
+            let blob = new Blob([content], { type: "text/plain" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "link-to-url.url";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</head>
+<body style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
+    <h2>Link to URL Generator</h2>
+    <input type="text" id="urlInput" placeholder="Enter any URL" style="width: 60%; padding: 8px;">
+    <button onclick="downloadURLFile()" style="padding: 10px; margin-left: 10px;">Download .url</button>
+</body>
+</html>
