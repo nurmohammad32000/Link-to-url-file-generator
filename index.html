@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link to URL Generator</title>
+    <title>YouTube URL to .url Generator</title>
     <script>
-        function isValidURL(url) {
+        async function isValidURL(url) {
             try {
                 new URL(url);
                 return true;
@@ -14,20 +14,49 @@
             }
         }
 
-        function downloadURLFile() {
+        async function getYouTubeVideoTitle(url) {
+            const videoId = extractYouTubeVideoId(url);
+            if (!videoId) {
+                return null;
+            }
+
+            try {
+                const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+                const data = await response.json();
+                return data.title;
+            } catch (error) {
+                console.error("Error fetching YouTube title:", error);
+                return null;
+            }
+        }
+
+        function extractYouTubeVideoId(url) {
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[7].length == 11) ? match[7] : false;
+        }
+
+        async function downloadURLFile() {
             let url = document.getElementById("urlInput").value.trim();
             let fileName = document.getElementById("fileNameInput").value.trim();
 
-            if (!isValidURL(url)) {
+            if (!await isValidURL(url)) {
                 alert("Please enter a valid URL.");
                 return;
             }
 
             if (!fileName) {
-                fileName = "link-to-url"; // Default filename if none provided
+                fileName = "link-to-url"; // Default filename
             }
 
             fileName = fileName.replace(/[^a-zA-Z0-9_-]/g, ""); // Sanitize filename
+
+            if (url.includes("youtube.com")) {
+                const videoTitle = await getYouTubeVideoTitle(url);
+                if (videoTitle) {
+                    fileName = videoTitle.replace(/[^a-zA-Z0-9_-]/g, ""); // Sanitize title for filename
+                }
+            }
 
             let content = `[InternetShortcut]\nURL=${url}`;
             let blob = new Blob([content], { type: "text/plain" });
@@ -43,9 +72,9 @@
     </script>
 </head>
 <body style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
-    <h2>Link to URL Generator</h2>
+    <h2>YouTube URL to .url Generator</h2>
     <input type="text" id="urlInput" placeholder="Enter any URL" style="width: 60%; padding: 8px; margin-bottom: 10px;"><br>
-    <input type="text" id="fileNameInput" placeholder="Enter file name (without extension)" style="width: 60%; padding: 8px; margin-bottom: 10px;"><br>
+    <input type="text" id="fileNameInput" placeholder="Enter file name (optional)" style="width: 60%; padding: 8px; margin-bottom: 10px;"><br>
     <button onclick="downloadURLFile()" style="padding: 10px; margin-left: 0px;">Download .url</button>
 </body>
 </html>
