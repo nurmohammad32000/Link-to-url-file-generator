@@ -16,12 +16,17 @@
 
         function downloadURLFile() {
             let url = document.getElementById("urlInput").value.trim();
+            let fileName = document.getElementById("fileNameInput").value.trim();
+
             if (!isValidURL(url)) {
                 alert("Please enter a valid URL.");
                 return;
             }
 
-            let fileName = prompt("Enter file name (without extension):", "link-to-url") || "link-to-url";
+            if (!fileName) {
+                fileName = "link-to-url"; // Default filename if none provided
+            }
+
             fileName = fileName.replace(/[^a-zA-Z0-9_-]/g, ""); // Sanitize filename
 
             let content = `[InternetShortcut]\nURL=${url}`;
@@ -39,8 +44,8 @@
 </head>
 <body style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
     <h2>Link to URL Generator</h2>
-    <input type="text" id="urlInput" placeholder="Enter any URL" style="width: 60%; padding: 8px;">
-    <button onclick="downloadURLFile()" style="padding: 10px; margin-left: 10px;">Download .url</button>
+    <input type="text" id="urlInput" placeholder="Enter any URL" style="width: 60%; padding: 8px; margin-bottom: 10px;"><br>
+    <input type="text" id="fileNameInput" placeholder="Enter file name (without extension)" style="width: 60%; padding: 8px; margin-bottom: 10px;"><br>
+    <button onclick="downloadURLFile()" style="padding: 10px; margin-left: 0px;">Download .url</button>
 </body>
 </html>
-
